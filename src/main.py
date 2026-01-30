@@ -4,26 +4,13 @@ import altair as alt
 
 from etl import run_pipeline
 
-st.title("📊 CSV Viewer")
 
-# Загрузка файла
-uploaded_file = st.file_uploader(
-    "Загрузи CSV файл",
-    type=["csv"]
-)
-
-# Приводим к числу (на всякий случай)
-if uploaded_file is not None:
-    # Чтение CSV
-    df = pd.read_csv(uploaded_file)
-
-    # Вся таблица на одной странице
+def data(df):
     st.subheader("Данные")
-
-    df = run_pipeline(df)
-
     st.dataframe(df, use_container_width=True, height=600)
 
+
+def week_day_spend(df):
     limit = st.number_input(
         "Максимальный размер расхода для анализа",
         min_value=0,
@@ -66,6 +53,8 @@ if uploaded_file is not None:
 
     st.altair_chart(chart, use_container_width=True)
 
+
+def category_spend(df):
     st.subheader("📊 Сумма трат по категориям")
 
     # на всякий случай привести к числу
@@ -88,43 +77,19 @@ if uploaded_file is not None:
 
     st.altair_chart(chart, use_container_width=True)
 
-    st.subheader("📊 Доходы (→) и расходы (←) по категориям")
 
-    tmp = df.copy()
-    tmp["Debits"] = pd.to_numeric(tmp["Debits"], errors="coerce")
-    tmp["Credits"] = pd.to_numeric(tmp["Credits"], errors="coerce")
+st.title("📊 CSV Viewer")
 
-    tmp["category"] = tmp["category"].fillna("Other")
+uploaded_file = st.file_uploader(
+    "Загрузи CSV файл",
+    type=["csv"]
+)
 
-    # агрегируем отдельно
-    exp = (
-        tmp[tmp["Debits"] < 0]
-        .assign(amount=lambda d: d["Debits"].abs())
-        .groupby("category", as_index=False)["amount"].sum()
-        .assign(side="expense", value_signed=lambda d: -d["amount"])
-    )
+if uploaded_file is not None:
+    df = pd.read_csv(uploaded_file)
 
-    inc = (
-        tmp[tmp["Credits"] > 0]
-        .assign(amount=lambda d: d["Credits"])
-        .groupby("category", as_index=False)["amount"].sum()
-        .assign(side="income", value_signed=lambda d: d["amount"])
-    )
+    df = run_pipeline(df)
 
-    by_cat = pd.concat([exp, inc], ignore_index=True)
-
-    chart = alt.Chart(by_cat).mark_bar().encode(
-        y=alt.Y("category:N", sort=alt.EncodingSortField(field="value_signed", op="sum", order="descending"),
-                title="Category"),
-        x=alt.X("value_signed:Q", title="PLN (← expenses | income →)"),
-        tooltip=[
-            "category:N",
-            "side:N",
-            alt.Tooltip("amount:Q", format=".2f", title="amount"),
-            alt.Tooltip("value_signed:Q", format=".2f", title="signed")
-        ]
-    )
-
-    st.altair_chart(chart, use_container_width=True)
-
-
+    data(df)
+    week_day_spend(df)
+    category_spend(df)

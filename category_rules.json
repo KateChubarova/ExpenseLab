@@ -1,0 +1,94 @@
+{
+  "food_delivery": [
+    "uber eats",
+    "pyszne",
+    "glovo",
+    "wolt",
+    "bolt food",
+    "frisco"
+  ],
+
+  "food": [
+    "zabka",
+    "biedronka",
+    "lidl",
+    "putka",
+    "carrefour",
+    "stokrotka",
+    "mcdonald",
+    "kfc",
+    "burger",
+    "caffe",
+    "coffee",
+    "ramen",
+    "dim sum",
+    "bakery",
+    "restaurant",
+    "grycan",
+    "zapiecek",
+    "pasibus",
+    "beer",
+    "food",
+    "viet",
+    "curry",
+    "herbate",
+    "luca",
+    "mini bibi",
+    "koneser",
+    "walek warszawski",
+    "waszyngton"
+  ],
+
+  "sport": [
+    "murall",
+    "wspinaczk",
+    "arena"
+  ],
+
+  "cosmetics": [
+    "rossmann",
+    "hebe",
+    "super\\s*-\\s*pharm",
+    "notino",
+    "rituals",
+    "ziaj",
+    "cosmetic",
+    "bath and body"
+  ],
+
+  "transport": [
+    "\\buber\\b(?! eats)",
+    "bolt",
+    "freenow",
+    "jakdojade",
+    "biletomat",
+    "pkp",
+    "lotnisko",
+    "parking",
+    "apcoa",
+    "orlen",
+    "bp\\b",
+    "shell",
+    "tfl",
+    "travel"
+  ],
+
+  "shopping": [
+    "allegro",
+    "amazon",
+    "vinted",
+    "temu",
+    "zara",
+    "oysho",
+    "h&m",
+    "uniqlo",
+    "nike",
+    "leroy",
+    "ikea",
+    "empik"
+  ],
+
+  "own_transfer": [
+    "own transfer"
+  ]
+}

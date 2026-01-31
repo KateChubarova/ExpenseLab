@@ -1,13 +1,4 @@
 {
-  "food_delivery": [
-    "uber eats",
-    "pyszne",
-    "glovo",
-    "wolt",
-    "bolt food",
-    "frisco"
-  ],
-
   "food": [
     "zabka",
     "biedronka",
@@ -38,13 +29,11 @@
     "walek warszawski",
     "waszyngton"
   ],
-
   "sport": [
     "murall",
     "wspinaczk",
     "arena"
   ],
-
   "cosmetics": [
     "rossmann",
     "hebe",
@@ -55,7 +44,34 @@
     "cosmetic",
     "bath and body"
   ],
-
+  "shopping": [
+    "allegro",
+    "amazon",
+    "vinted",
+    "temu",
+    "zara",
+    "oysho",
+    "h&m",
+    "uniqlo",
+    "nike",
+    "leroy",
+    "ikea",
+    "empik"
+  ],
+  "cash": [],
+  "other": [],
+  "return": [],
+  "own transfer": [
+    "own transfer"
+  ],
+  "food delivery": [
+    "uber eats",
+    "pyszne",
+    "glovo",
+    "wolt",
+    "bolt food",
+    "frisco"
+  ],
   "transport": [
     "\\buber\\b(?! eats)",
     "bolt",
@@ -71,24 +87,5 @@
     "shell",
     "tfl",
     "travel"
-  ],
-
-  "shopping": [
-    "allegro",
-    "amazon",
-    "vinted",
-    "temu",
-    "zara",
-    "oysho",
-    "h&m",
-    "uniqlo",
-    "nike",
-    "leroy",
-    "ikea",
-    "empik"
-  ],
-
-  "own_transfer": [
-    "own transfer"
   ]
 }

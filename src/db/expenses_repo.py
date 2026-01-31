@@ -1,7 +1,10 @@
 import hashlib
 import pandas as pd
+import streamlit as st
 from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy import select
 
+from .mapper import map_db_to_ui
 from .models import Expense
 from .session import SessionLocal
 
@@ -25,7 +28,6 @@ def save_expenses(df: pd.DataFrame) -> int:
     df = df.copy()
     df["id"] = df.apply(make_id, axis=1)
 
-    # Собираем записи напрямую (без Expense(...))
     cols = [
         "id", "saldo", "account",
         "transaction date", "settlement date", "transaction type",
@@ -52,5 +54,19 @@ def save_expenses(df: pd.DataFrame) -> int:
         db.rollback()
         raise
 
+    finally:
+        db.close()
+
+
+@st.cache_data
+def get_expenses() -> pd.DataFrame:
+    db = SessionLocal()
+    try:
+        stmt = select(Expense)
+        result = db.execute(stmt)
+        rows = result.scalars().all()
+
+        return pd.DataFrame([map_db_to_ui(row) for row in rows]
+                            )
     finally:
         db.close()

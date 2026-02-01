@@ -2,6 +2,8 @@ import streamlit as st
 import json
 from pathlib import Path
 
+from db.expenses_repo import rename_category
+
 
 def render_category_manager_minimal(
         *,
@@ -129,17 +131,27 @@ def render_category_manager_minimal(
 
         with b:
             if st.button("Save", use_container_width=True):
+                old_name = sel
                 new_name = (new_name or "").strip()
+
                 if not new_name:
                     st.caption("Enter a name")
-                elif new_name != sel and new_name in rules:
+                elif new_name != old_name and new_name in rules:
                     st.caption("Name taken")
                 else:
-                    rules[new_name] = rules.pop(sel)
+                    rename_category(old_name, new_name)
+
+                    rules[new_name] = rules.pop(old_name)
                     rules = normalize_rules(rules)
-                    st.session_state["cat_rules"] = rules
                     persist(rules)
-                    st.rerun()
+                    st.session_state["cat_rules"] = normalize_rules(load_rules())
+
+                    try:
+                        st.cache_data.clear()
+                        st.load_category_rules_cached.clear()
+                        st.rerun()
+                    except Exception:
+                        pass
 
         with c:
             with st.popover("Delete", use_container_width=True):

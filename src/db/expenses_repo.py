@@ -2,7 +2,7 @@ import hashlib
 import pandas as pd
 import streamlit as st
 from sqlalchemy.dialects.postgresql import insert
-from sqlalchemy import select
+from sqlalchemy import select, update
 
 from .mapper import map_db_to_ui
 from .models import Expense
@@ -70,3 +70,22 @@ def get_expenses() -> pd.DataFrame:
                             )
     finally:
         db.close()
+
+
+def rename_category(old_name: str, new_name: str) -> int:
+    with SessionLocal() as db:
+        try:
+            stmt = (
+                update(Expense)
+                .where(Expense.category == old_name)
+                .values(category=new_name)
+                .execution_options(synchronize_session="fetch")
+            )
+            res = db.execute(stmt)
+            db.commit()
+            db.close()
+            return res.rowcount or 0
+        except Exception:
+            db.rollback()
+            raise
+

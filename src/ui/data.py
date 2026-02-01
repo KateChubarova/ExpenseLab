@@ -10,11 +10,6 @@ def load_category_rules_cached() -> dict:
         return json.load(f)
 
 
-def save_category_rules(rules: dict) -> None:
-    with open(RULES_PATH, "w", encoding="utf-8") as f:
-        json.dump(rules, f, ensure_ascii=False, indent=2)
-
-
 def show_data(df):
     rules = load_category_rules_cached()
     categories = sorted(rules.keys())
@@ -28,7 +23,7 @@ def show_data(df):
         },
         disabled=[c for c in df.columns if c != "category"],
         key="expense_editor",
-        use_container_width=True,
+        width="stretch",
         num_rows="fixed",
     )
 

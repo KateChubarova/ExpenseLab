@@ -2,7 +2,7 @@ import streamlit as st
 import json
 from pathlib import Path
 
-from db.expenses_repo import rename_category
+from db.expenses_repo import rename_category, get_expenses
 
 
 def render_category_manager_minimal(
@@ -90,7 +90,7 @@ def render_category_manager_minimal(
         st.session_state["selected_category"] = sel
 
     with right:
-        with st.popover("＋", use_container_width=True):
+        with st.popover("＋", width="stretch"):
             if st.session_state["cat_add_reset"]:
                 st.session_state["cat_add_min"] = ""
                 st.session_state["cat_add_reset"] = False
@@ -102,7 +102,7 @@ def render_category_manager_minimal(
                 key="cat_add_min",
             )
 
-            if st.button("Add", key="cat_add_btn_min", use_container_width=True):
+            if st.button("Add", key="cat_add_btn_min", width="stretch"):
                 new_cat = (new_cat or "").strip()
                 if not new_cat:
                     st.caption("Enter a name")
@@ -130,7 +130,7 @@ def render_category_manager_minimal(
             )
 
         with b:
-            if st.button("Save", use_container_width=True):
+            if st.button("Save", width="stretch"):
                 old_name = sel
                 new_name = (new_name or "").strip()
 
@@ -140,7 +140,6 @@ def render_category_manager_minimal(
                     st.caption("Name taken")
                 else:
                     rename_category(old_name, new_name)
-
                     rules[new_name] = rules.pop(old_name)
                     rules = normalize_rules(rules)
                     persist(rules)
@@ -148,15 +147,15 @@ def render_category_manager_minimal(
 
                     try:
                         st.cache_data.clear()
-                        st.load_category_rules_cached.clear()
+                        get_expenses.clear()
                         st.rerun()
-                    except Exception:
-                        pass
+                    except Exception as e:
+                        print(f"Error:{e}")
 
         with c:
-            with st.popover("Delete", use_container_width=True):
+            with st.popover("Delete", width="stretch"):
                 st.warning(f"Delete **{sel}**?")
-                if st.button("Confirm", type="primary", use_container_width=True):
+                if st.button("Confirm", type="primary", width="stretch"):
                     rules.pop(sel, None)
                     rules = normalize_rules(rules)
                     st.session_state["cat_rules"] = rules

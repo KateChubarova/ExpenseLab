@@ -8,7 +8,6 @@ class Expense(Base):
     __tablename__ = "expense"
     __table_args__ = (
         Index("ix_expense_transaction_date", "transaction_date"),
-        Index("ix_expense_category", "category"),
         {"schema": "public"},
     )
 

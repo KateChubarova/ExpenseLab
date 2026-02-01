@@ -4,6 +4,10 @@ import altair as alt
 
 
 def category_spend(df):
+    if df is None or df.empty:
+        st.info("Нет данных для анализа расходов по категориям")
+        return
+
     st.subheader("📊 Сумма трат по категориям")
 
     df["debits"] = pd.to_numeric(df["debits"], errors="coerce")

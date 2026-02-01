@@ -26,4 +26,4 @@ def category_spend(df):
         tooltip=["category:N", alt.Tooltip("expense:Q", format=".2f")]
     )
 
-    st.altair_chart(chart, use_container_width=True)
+    st.altair_chart(chart, width="stretch")

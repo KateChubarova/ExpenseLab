@@ -1,80 +1,23 @@
 import streamlit as st
-import json
-from pathlib import Path
 
 from db.expenses_repo import rename_category, get_expenses
+from db.rules_repo import load_rules, persist, normalize_rules
+
+RESET_ADD_INPUT = "cat_add_reset"
+CATEGORIES = "cat_rules"
 
 
-def render_category_manager_minimal(
-        *,
-        categories_file: str = "category_rules.json",
-        default_rules: dict[str, list[str]] | None = None,
-        keep_other: bool = True,
-) -> None:
-    if default_rules is None:
-        default_rules = {"other": []}
-
-    path = Path(categories_file)
-
-    def load_rules() -> dict[str, list[str]]:
-        if path.exists():
-            try:
-                data = json.loads(path.read_text(encoding="utf-8"))
-                if isinstance(data, dict):
-                    out: dict[str, list[str]] = {}
-                    for k, v in data.items():
-                        k = str(k).strip()
-                        if not k:
-                            continue
-                        if isinstance(v, list):
-                            out[k] = [str(x) for x in v if str(x).strip()]
-                        else:
-                            out[k] = []
-                    return out
-            except Exception:
-                pass
-        return default_rules.copy()
-
-    def persist(rules: dict[str, list[str]]) -> None:
-        try:
-            path.write_text(json.dumps(rules, ensure_ascii=False, indent=2), encoding="utf-8")
-        except Exception:
-            pass
-
-    def normalize_rules(rules: dict[str, list[str]]) -> dict[str, list[str]]:
-        out: dict[str, list[str]] = {}
-        for k, v in rules.items():
-            k = str(k).strip()
-            if not k:
-                continue
-            lst = v if isinstance(v, list) else []
-            cleaned = []
-            seen = set()
-            for x in lst:
-                s = str(x).strip()
-                if not s:
-                    continue
-                if s in seen:
-                    continue
-                seen.add(s)
-                cleaned.append(s)
-            out[k] = cleaned
-
-        if keep_other and "other" not in out:
-            out["other"] = []
-
-        return out
-
-    if "cat_rules" not in st.session_state:
-        st.session_state["cat_rules"] = normalize_rules(load_rules())
+def render_category_manager_minimal() -> None:
+    if CATEGORIES not in st.session_state:
+        st.session_state[CATEGORIES] = normalize_rules(load_rules())
     else:
-        st.session_state["cat_rules"] = normalize_rules(st.session_state["cat_rules"])
+        st.session_state[CATEGORIES] = normalize_rules(st.session_state[CATEGORIES])
 
-    if "cat_add_reset" not in st.session_state:
-        st.session_state["cat_add_reset"] = False
+    if RESET_ADD_INPUT not in st.session_state:
+        st.session_state[RESET_ADD_INPUT] = False
 
-    rules: dict[str, list[str]] = st.session_state["cat_rules"]
-    cats = sorted(rules.keys())
+    rules: dict[str, list[str]] = st.session_state[CATEGORIES]
+    cats = list(rules.keys())
 
     left, right = st.columns([10, 1], vertical_alignment="center")
 
@@ -91,9 +34,9 @@ def render_category_manager_minimal(
 
     with right:
         with st.popover("＋", width="stretch"):
-            if st.session_state["cat_add_reset"]:
+            if st.session_state[RESET_ADD_INPUT]:
                 st.session_state["cat_add_min"] = ""
-                st.session_state["cat_add_reset"] = False
+                st.session_state[RESET_ADD_INPUT] = False
 
             new_cat = st.text_input(
                 " ",
@@ -111,9 +54,11 @@ def render_category_manager_minimal(
                 else:
                     rules[new_cat] = []
                     rules = normalize_rules(rules)
-                    st.session_state["cat_rules"] = rules
+                    st.session_state[CATEGORIES] = rules
                     persist(rules)
-                    st.session_state["cat_add_reset"] = True
+                    st.session_state[RESET_ADD_INPUT] = True
+                    st.cache_data.clear()
+                    get_expenses.clear()
                     st.rerun()
 
     if sel:
@@ -143,7 +88,7 @@ def render_category_manager_minimal(
                     rules[new_name] = rules.pop(old_name)
                     rules = normalize_rules(rules)
                     persist(rules)
-                    st.session_state["cat_rules"] = normalize_rules(load_rules())
+                    st.session_state[CATEGORIES] = normalize_rules(load_rules())
 
                     try:
                         st.cache_data.clear()
@@ -158,6 +103,11 @@ def render_category_manager_minimal(
                 if st.button("Confirm", type="primary", width="stretch"):
                     rules.pop(sel, None)
                     rules = normalize_rules(rules)
-                    st.session_state["cat_rules"] = rules
+                    st.session_state[CATEGORIES] = rules
                     persist(rules)
-                    st.rerun()
+                    try:
+                        st.cache_data.clear()
+                        get_expenses.clear()
+                        st.rerun()
+                    except Exception as e:
+                        print(f"Error:{e}")

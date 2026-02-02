@@ -1,4 +1,6 @@
 import hashlib
+import logging
+
 import pandas as pd
 import streamlit as st
 from sqlalchemy.dialects.postgresql import insert
@@ -50,7 +52,8 @@ def save_expenses(df: pd.DataFrame) -> int:
 
         return int(result.rowcount or 0)
 
-    except Exception:
+    except Exception as e:
+        logging.exception(e)
         db.rollback()
         raise
 
@@ -85,7 +88,8 @@ def rename_category(old_name: str, new_name: str) -> int:
             db.commit()
             db.close()
             return res.rowcount or 0
-        except Exception:
+        except Exception as e:
+            logging.exception(e)
             db.rollback()
             raise
 

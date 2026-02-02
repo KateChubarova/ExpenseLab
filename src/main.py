@@ -1,3 +1,5 @@
+import logging
+
 import pandas as pd
 
 import streamlit as st
@@ -24,8 +26,8 @@ if uploaded_file is not None:
 
         try:
             get_expenses.clear()
-        except Exception:
-            pass
+        except Exception as e:
+            logging.exception(e)
 
         st.rerun()
 
